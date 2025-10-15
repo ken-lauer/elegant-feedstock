@@ -66,6 +66,9 @@ CC=${CC_FOR_BUILD}
 CCC=${CXX_FOR_BUILD}
 EOF
 
+echo "* Removing vendored lzma"
+rm -rfv "${SRC_DIR}/epics/extensions/src/SDDS/lzma"
+
 if [[ $(uname -s) == 'Linux' ]]; then
   cat <<EOF >>"${SRC_DIR}/epics/base/configure/os/CONFIG_SITE.Common.${EPICS_HOST_ARCH}"
 USR_LDFLAGS+= -Wl,--disable-new-dtags -Wl,-rpath-link,${PREFIX}/lib
@@ -99,7 +102,6 @@ elif [[ $(uname -s) == 'Darwin' ]]; then
     echo "* Building essential tools on the host for cross-compilation (specifically: nlpp)"
     for path in \
       "${SRC_DIR}/epics/base" \
-      "${SRC_DIR}/epics/extensions/src/SDDS/lzma" \
       "${SRC_DIR}/epics/extensions/src/SDDS/mdblib" \
       "${SRC_DIR}/epics/extensions/src/SDDS/namelist"; do
       echo "* Building $path"
@@ -144,7 +146,6 @@ fi
 echo "* Removing vendored libraries for the target build"
 rm -rfv "${SRC_DIR}/epics/extensions/src/SDDS/png"
 rm -rfv "${SRC_DIR}/epics/extensions/src/SDDS/gd"
-rm -rfv "${SRC_DIR}/epics/extensions/src/SDDS/lzma"
 rm -rfv "${SRC_DIR}/epics/extensions/src/SDDS/tiff"
 rm -rfv "${SRC_DIR}/epics/extensions/src/SDDS/zlib"
 

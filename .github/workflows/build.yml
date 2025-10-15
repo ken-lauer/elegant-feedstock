@@ -1,0 +1,64 @@
+name: build
+
+on:
+  push:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest-large
+            architecture: x86_64
+
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+          detached: true
+
+      - name: Update environment
+        shell: bash -l {0}
+        run: |
+          python build-locally.py osx_arm64_mpimpichpython3.10.____cpython || echo "Failure"
+
+      - name: Wait
+        shell: bash -l {0}
+        run: |
+          sleep 50000
+
+      # - uses: actions/cache@v3
+      #   id: cache
+      #   with:
+      #     path: ${{ env.CONDA }}/envs
+      #     key: conda-${{ matrix.os }}-${{ matrix.architecture }}-${{ hashFiles('environment.yml') }}-${{ env.DATE }}-3
+      # - name: Update environment
+      #   shell: bash -l {0}
+      #   run: |
+      #     conda list
+      #     conda install mamba
+      #     mamba env update -n pelegant -f environment.yml
+      #   if: steps.cache.outputs.cache-hit != 'true'
+      # - name: Try to build
+      #   shell: bash -l {0}
+      #   run: |
+      #     bash build.sh
+      # - name: Tar the binaries
+      #   shell: bash -l {0}
+      #   run: |
+      #     mamba env export > env.yml
+      #     tar cvf Pelegant-${{ matrix.os }}-${{ matrix.architecture }}-binaries.tar \
+      #       ./oag/apps/bin \
+      #       ./epics/extensions/bin \
+      #       ./env.yml
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: Pelegant-${{ matrix.os }}-${{ matrix.architecture }}-binaries
+      #     path: Pelegant-${{ matrix.os }}-${{ matrix.architecture }}-binaries.tar
